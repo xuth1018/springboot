@@ -4,8 +4,10 @@ import com.company.project.core.Result;
 import com.company.project.core.ResultGenerator;
 import com.company.project.model.Info;
 import com.company.project.service.InfoService;
+import com.company.project.util.RedisUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,6 +24,8 @@ import java.util.List;
 public class InfoController {
     @Resource
     private InfoService infoService;
+    @Autowired
+    private RedisUtil redisUtil;
 
     @PostMapping("/add")
     public Result add(Info info) {
@@ -53,5 +57,15 @@ public class InfoController {
         List<Info> list = infoService.findAll();
         PageInfo pageInfo = new PageInfo(list);
         return ResultGenerator.genSuccessResult(pageInfo);
+    }
+
+    @PostMapping("/redis")
+    public void redis(){
+        redisUtil.set("x","t");
+    }
+
+    @PostMapping("/getRedis")
+    public Result getRedis(){
+        return ResultGenerator.genSuccessResult(redisUtil.get("x"));
     }
 }
