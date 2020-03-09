@@ -68,4 +68,6 @@ public class InfoController {
     public Result getRedis(){
         return ResultGenerator.genSuccessResult(redisUtil.get("x"));
     }
+
+
 }
