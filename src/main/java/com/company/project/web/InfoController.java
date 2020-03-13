@@ -8,12 +8,18 @@ import com.company.project.util.RedisUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.time.DayOfWeek;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 /**
@@ -61,13 +67,30 @@ public class InfoController {
 
     @PostMapping("/redis")
     public void redis(){
-        redisUtil.set("x","t");
+        LocalDateTime dateTime = LocalDateTime.now();
+        LocalDateTime lastDay = LocalDateTime.of(dateTime.getYear(),dateTime.getMonth().plus(1),1,0,0);
+        Duration duration = Duration.between(dateTime,lastDay);
+        long minutes = duration.toMinutes();//相差的分钟数
+        long millis = duration.toMillis();//相差毫秒数
+        long s = duration.getSeconds();
+        System.out.println(s);
+        Object id = redisUtil.get("meeting");
+        if(null==id){
+           redisUtil.set("meeting",1);
+        }else{
+            long ids = redisUtil.incr("meeting",1);
+        }
+        redisUtil.expire("meeting",s);
+
     }
 
     @PostMapping("/getRedis")
     public Result getRedis(){
-        return ResultGenerator.genSuccessResult(redisUtil.get("x"));
+        return ResultGenerator.genSuccessResult(redisUtil.get("meeting"));
     }
 
 
+    public static void main(String[] args) {
+
+    }
 }

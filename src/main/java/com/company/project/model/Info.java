@@ -13,6 +13,16 @@ public class Info {
 
     private String email;
 
+    public Info() {
+    }
+
+    public Info(Integer id,String username, String password, String email) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
+
     /**
      * @return id
      */
