@@ -4,12 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -171,7 +170,7 @@ public class RedisUtil {
      * @param map
      * @return
      */
-    public boolean hmset(String key,Map<String,Object> map){
+    public <T> boolean hmset(String key, Map<String,T> map){
         return hmset(key,map,-1);
     }
 
@@ -182,7 +181,7 @@ public class RedisUtil {
      * @param time
      * @return
      */
-    public boolean hmset(String key,Map<String,Object> map,long time){
+    public <T> boolean hmset(String key, Map<String,T> map, long time){
         try{
             redisTemplate.opsForHash().putAll(key,map);
             if(time>0){
@@ -194,6 +193,8 @@ public class RedisUtil {
             return false;
         }
     }
+
+
 
     /**
      * 像一张hash表中存入数据，如果不存在就创建
@@ -452,7 +453,7 @@ public class RedisUtil {
      */
     public long lRemove(String key, long count, Object value) {
         try {
-            Long remove = redisTemplate.opsForList().remove(key, count, value);
+            Long remove = redisTemplate.opsForSet().remove(key, count, value);
             return remove;
         } catch (Exception e) {
             e.printStackTrace();
