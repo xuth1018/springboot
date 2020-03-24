@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" type="text/css">
+</head>
+<body>
+<table>
+    <tr>
+        <th>parentCode</th>
+        <th>code</th>
+        <th>value</th>
+    </tr>
+    <tr th:each="list : ${dict}">
+        <td th:text="${list.parentCode}"></td>
+        <td th:text="${list.code}"></td>
+        <td th:text="${list.value}"></td>
+    </tr>
+</table>
+
+</body>
+</html>

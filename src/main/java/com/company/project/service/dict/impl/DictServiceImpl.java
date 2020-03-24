@@ -2,6 +2,7 @@ package com.company.project.service.dict.impl;
 
 
 import com.alibaba.fastjson.JSON;
+import com.company.project.annotation.Log;
 import com.company.project.core.Result;
 import com.company.project.core.ResultCode;
 import com.company.project.core.ServiceException;
@@ -16,10 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class DictServiceImpl implements DictService {
@@ -77,6 +75,7 @@ public class DictServiceImpl implements DictService {
         return result;
     }
 
+    @Log
     @Override
     public Result getDictFromRedis(String key) {
         logger.info("===DictServiceImpl.refreshRedis()===:info:{}",key);
@@ -89,5 +88,6 @@ public class DictServiceImpl implements DictService {
         }
         return result;
     }
+
 
 }

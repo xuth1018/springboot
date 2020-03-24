@@ -19,4 +19,5 @@ public enum ResultCode {
     public int code() {
         return code;
     }
+
 }

@@ -5,6 +5,11 @@ public class CodeAndValue {
     private String Code;
     private String value;
 
+    public CodeAndValue(String code, String value) {
+        Code = code;
+        this.value = value;
+    }
+
     public String getCode() {
         return Code;
     }
