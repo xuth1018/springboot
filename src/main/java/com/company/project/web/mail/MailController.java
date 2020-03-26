@@ -1,3 +1,4 @@
+/*
 package com.company.project.web.mail;
 
 import com.company.project.core.Result;
@@ -50,3 +51,4 @@ public class MailController {
         return ResultGenerator.genSuccessResult();
     }
 }
+*/

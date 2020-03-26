@@ -2,6 +2,7 @@ package com.company.project.configurer;
 
 import com.alibaba.fastjson.JSON;
 import com.company.project.annotation.Log;
+import org.apache.tomcat.util.http.fileupload.RequestContext;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.After;
@@ -13,7 +14,12 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.stream.events.StartDocument;
 import java.lang.reflect.Method;
 
@@ -47,20 +53,25 @@ public class LogAspect {
      */
     @Around("pointcut()")
     public Object doAround(ProceedingJoinPoint point){
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        String str = getMethodInfo(point);
         Object result = null;
-        long beginTime = System.currentTimeMillis();
         try{//执行方法
-            getMethodInfo(point);
-            result = point.proceed();
+            result =  point.proceed();
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
-        long endTime = System.currentTimeMillis();
-        logger.info("执行时间：{}",endTime-beginTime);
+        stopWatch.stop();
+        logger.info(str+"---执行时间：{}",stopWatch.prettyPrint());
         return result;
     }
 
-    private void getMethodInfo(ProceedingJoinPoint point){
+    private String getMethodInfo(ProceedingJoinPoint point){
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = attributes.getRequest();
+        String url = request.getRequestURI();
+
         MethodSignature signature = (MethodSignature) point.getSignature();
         Method method = signature.getMethod();
         Log log = method.getAnnotation(Log.class);
@@ -73,7 +84,8 @@ public class LogAspect {
         String methodName = signature.getName();
         //参数值
         Object[] args = point.getArgs();
-        logger.info("==="+className+"."+methodName+"()===info:{}", JSON.toJSONString(args));
+        logger.info(url+"---info:{}", JSON.toJSONString(args));
+        return url;
     }
 
 

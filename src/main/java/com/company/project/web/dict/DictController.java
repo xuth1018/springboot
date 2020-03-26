@@ -1,12 +1,14 @@
 package com.company.project.web.dict;
 
 
+import com.company.project.annotation.Log;
 import com.company.project.core.Result;
 import com.company.project.core.ResultGenerator;
 import com.company.project.model.dict.Dict;
 import com.company.project.service.dict.DictService;
 import com.company.project.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,12 +43,13 @@ public class DictController {
     }
 
     @PostMapping("getDictFromRedis")
-    public Result getDictFromRedis(@RequestParam String key){
+    public Result getDictFromRedis( String key){
         return dictService.getDictFromRedis(key);
     }
 
-    @PostMapping("getRedis")
-    public Result getRedis(String key){
+    @Log
+    @PostMapping("getRedis/{key}")
+    public Result getRedis(@PathVariable String key){
         Map<Object,Object> map= redisUtil.hmget(key);
         Map<Object,Object> map1 = new TreeMap<>(map);
         return ResultGenerator.genSuccessResult(map1);
