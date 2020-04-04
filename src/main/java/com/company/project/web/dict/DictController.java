@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,52 +35,64 @@ public class DictController {
     private RedisUtil redisUtil;
 
     @PostMapping("/addDict")
-    public Result addDict(@RequestBody List<Dict> dict){
+    public Result addDict(@RequestBody List<Dict> dict) {
         return dictService.addDict(dict);
     }
 
     @PostMapping("refreshRedis")
-    public Result refreshRedis(){
+    public Result refreshRedis() {
         return dictService.refreshRedis();
     }
 
     @PostMapping("getDictFromRedis")
-    public Result getDictFromRedis( String key){
+    public Result getDictFromRedis(String key) {
         return dictService.getDictFromRedis(key);
     }
 
     @Log
     @PostMapping("getRedis/{key}")
-    public Result getRedis(@PathVariable String key){
-        Map<Object,Object> map= redisUtil.hmget(key);
-        Map<Object,Object> map1 = new TreeMap<>(map);
-        return ResultGenerator.genSuccessResult(map1);
+    public Result getRedis(@PathVariable String key) {
+        Map<Object, Object> map = redisUtil.hmget(key);
+        Map<Object, Object> map1 = new TreeMap<>(map);
+        System.out.println(map);
+        return ResultGenerator.genSuccessResult(map);
     }
 
     @PostMapping("putRedis")
-    public Result putRedis(){
+    public Result putRedis() {
         List<Dict> list = new ArrayList<>();
-        list.add(new Dict("1","A001","数学"));
-        list.add(new Dict("1","A002","物理"));
-        list.add(new Dict("2","A003","语文"));
-        list.add(new Dict("2","A004","政治"));
-        list.add(new Dict("2","A005","历史"));
-        Map<String, Map<String,String>> map = new HashMap<>();
-        for(Dict dict:list){
-            if(map.containsKey(dict.getParentCode())){
-                map.get(dict.getParentCode()).put(dict.getCode(),dict.getValue());
-            }else{
-                Map<String,String> map1 = new HashMap();
-                map1.put(dict.getCode(),dict.getValue());
-                map.put(dict.getParentCode(),map1);
+        list.add(new Dict("1", "A001", "数学"));
+        list.add(new Dict("1", "A002", "物理"));
+        list.add(new Dict("2", "A003", "语文"));
+        list.add(new Dict("2", "A004", "政治"));
+        list.add(new Dict("2", "A005", "历史"));
+        Map<String, Map<String, String>> map = new HashMap<>();
+        for (Dict dict : list) {
+            if (map.containsKey(dict.getParentCode())) {
+                map.get(dict.getParentCode()).put(dict.getCode(), dict.getValue());
+            } else {
+                Map<String, String> map1 = new HashMap();
+                map1.put(dict.getCode(), dict.getValue());
+                map.put(dict.getParentCode(), map1);
             }
         }
-        Set<Map.Entry<String,Map<String,String>>> entry1 = map.entrySet();
-        for(Map.Entry<String,Map<String,String>> entry:entry1){
-            redisUtil.hmset(entry.getKey(),entry.getValue());
+        Set<Map.Entry<String, Map<String, String>>> entry1 = map.entrySet();
+        for (Map.Entry<String, Map<String, String>> entry : entry1) {
+            redisUtil.hmset(entry.getKey(), entry.getValue());
         }
         return ResultGenerator.genSuccessResult(map);
     }
 
 
+    public String getKey(String... key){
+        for(String s:key){
+            System.out.println(s);
+        }
+        return key.toString();
+    }
+    public static void main(String[] args) {
+        DictController d = new DictController();
+        String[] str = new String[]{"242","421"};
+        d.getKey(str);
+    }
 }

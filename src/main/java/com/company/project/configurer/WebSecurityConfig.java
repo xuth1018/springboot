@@ -1,0 +1,61 @@
+package com.company.project.configurer;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.stereotype.Component;
+
+@Component
+@EnableWebSecurity
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/**");
+    }
+
+    /**
+     * 通过@EnableWebSecurity注解开启Spring Security的功能
+     * 继承WebSecurityConfigurerAdapter，并重写它的方法来设置一些web安全的细节
+     * configure(HttpSecurity http)方法
+     * 通过authorizeRequests()定义哪些URL需要被保护、哪些不需要被保护。例如以上代码指定了/和/home不需要任何认证就可以访问，其他的路径都必须通过身份验证。
+     * 通过formLogin()定义当需要用户登录时候，转到的登录页面。
+     * configureGlobal(AuthenticationManagerBuilder auth)方法，在内存中创建了一个用户，该用户的名称为user，密码为password，用户角色为USER。
+     *
+     */
+
+    //@Override
+    public void configure(HttpSecurity http) throws Exception {
+        http.csrf().disable()
+             .authorizeRequests()
+                .antMatchers("/","/dict").permitAll()
+                .anyRequest().authenticated()
+                .and()
+             .formLogin()
+                .loginPage("/login")
+                .usernameParameter("username")
+                .passwordParameter("password")
+                .permitAll()
+                .and()
+             .logout()
+                .permitAll()
+                .and()
+        .sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        //always – a session will always be created if one doesn’t already exist，没有session就创建。
+        //ifRequired – a session will be created only if required (default)，如果需要就创建（默认）。
+        //never – the framework will never create a session itself but it will use one if it already exists
+        //stateless – no session will be created or used by Spring Security 不创建不使用session
+    }
+
+    @Autowired
+    public void configGlobal(AuthenticationManagerBuilder builder) throws Exception {
+        builder.inMemoryAuthentication()
+                .withUser("user").password("password").roles("USER");
+        //builder.userDetailsService(userDetailsService).passwordEncoder();
+    }
+}
