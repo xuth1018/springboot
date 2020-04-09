@@ -8,8 +8,10 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.SimpleFormatter;
 
 @Component
 public class RedisUtil {
@@ -45,7 +47,7 @@ public class RedisUtil {
      * @return 0 代表永久有效
      */
     public long getExpire(String key){
-        return redisTemplate.getExpire(key);
+        return redisTemplate.getExpire(key,TimeUnit.SECONDS);
     }
 
     /**
@@ -461,5 +463,10 @@ public class RedisUtil {
         }
     }
 
+    public static void main(String[] args) {
+        SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
+        System.out.println(sdf.format(new Date(14214)));
+
+    }
 
 }
