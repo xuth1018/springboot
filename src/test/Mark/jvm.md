@@ -41,6 +41,43 @@
  递归（不停的入栈）栈空间溢出
  
 7.堆 heap
- 一个jvm实例只存在一个堆内存，堆内存
+ 一个jvm实例只存在一个堆内存，堆大小 堆中保存着所有引用类型的真实信息以方便执行器执行
+ 
+ Eden space伊甸区              8/10
+ survivor 0 space   幸存区0      1/10
+ survivor 1 space 幸存区1      1/10
+ old generation   老生代
+ metaspace        元数据
+ 
+ 新生代：eden survivor0（from） survivor1（to） 
+ 老生代 old
+ 新：老  1:2
+ java1.7 永久带  1.8 元数据
+ 永久带使用jvm堆内存   元数据 本机物理内存
+ 
+ a.任何新对象都在eden区new创建 
+ b.随着对象的不断创建，eden区逐渐被填满
+ c.触发一次young gc（minor gc）删除为引用的对象，gc剩下来的还存在引用的对象将移动到
+   幸存者区0区，然后清空eden区。对象
+ d.随着对象的创建，eden区空间又满了，再一次出发gc，删除为引用的对象，这次gc留下来的对象
+   移动到幸存者1区，并且上一轮gc留下来的存储在幸存者0区的对象年龄递增并移动到幸存者1区，
+   当所有的对象移动到幸存者1区后，幸存者0区和eden区删除
+ e.随着第三次eden区满，触发了gc，gc留下来的对象移动到幸存者0区，幸存者1区的对象年龄增长
+   也移动到幸存者0区，然后伊甸园和幸存者1区的对象删除
+ f.随着young gc的不断发生，幸存对象在两个幸存区不断交换存储，年龄不断递增，当幸存者年龄
+   达到指定的阈值（MaxTenuringThreshold=8）他们将移动到老生代。
+ g.随着上述过程的不断发生，当养老区不断变慢时，将触发major gc（full gc）进行养老区的
+   内存清理。若养老区执行了gc后发现依然无法进入对象的保存 就会OOM
  
  
+7：堆参数
+ -Xms   堆初始大小   程序启动时
+ -Xmn   堆最大内存   程序运行时
+ -Xss   启动线程堆栈内存
+ -Xmn   新生代内存大小
+ -XX:MaxTenuring Threshold 转入养老区存活次数 阈值
+ -XX:NewRatio 新生代 老生代比例  2：养老区是新生区的2倍
+ -XX:NewSize  新生区初始大小
+ -XX:MaxNewSize 新生最大大小
+ -XX:SurvivorRatio  eden与survivor区比例 5:  5:2
+ -XX:PrintGCDetails 日志打印
